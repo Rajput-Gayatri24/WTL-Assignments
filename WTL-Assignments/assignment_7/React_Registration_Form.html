@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Controlled Components - User Registration Form</title>
+  <!-- React and Babel CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #0b0f19;
+      color: #f3f4f6;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 0.9rem;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(129, 140, 248, 0.3);
+      color: #818cf8;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      border-radius: 9999px;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+    }
+    header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+    header p {
+      color: #9ca3af;
+      font-size: 1rem;
+    }
+    code {
+      background: #1e293b;
+      color: #38bdf8;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+    }
+    .card {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+    .form-section {
+      margin-bottom: 2rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid #1f2937;
+    }
+    .form-section:last-of-type {
+      border-bottom: none;
+    }
+    .section-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #e5e7eb;
+      margin-bottom: 1.25rem;
+    }
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+    @media (max-width: 640px) {
+      .grid-2col { grid-template-columns: 1fr; }
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1.25rem;
+    }
+    .field label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #d1d5db;
+      margin-bottom: 0.4rem;
+      display: flex;
+      justify-content: space-between;
+    }
+    .req { color: #ef4444; }
+    input[type="text"], input[type="email"], input[type="password"], select, textarea {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      color: #ffffff;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    }
+    .field.error input, .field.error select {
+      border-color: #ef4444;
+    }
+    .error-msg {
+      color: #f87171;
+      font-size: 0.8rem;
+      margin-top: 0.35rem;
+    }
+    .pass-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .toggle-pass {
+      position: absolute;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+    .strength-bar {
+      height: 6px;
+      background: #374151;
+      border-radius: 999px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%;
+      transition: width 0.3s ease, background-color 0.3s ease;
+    }
+    .radio-group, .checkbox-grid {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .pill-label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #1f2937;
+      padding: 0.5rem 0.9rem;
+      border-radius: 8px;
+      border: 1px solid #374151;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .pill-label.active {
+      background: rgba(99, 102, 241, 0.15);
+      border-color: #6366f1;
+      color: #818cf8;
+    }
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #1f2937;
+    }
+    .btn-reset {
+      background: transparent;
+      border: 1px solid #374151;
+      color: #9ca3af;
+      padding: 0.8rem 1.4rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-submit {
+      background: #6366f1;
+      border: none;
+      color: white;
+      padding: 0.85rem 2rem;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .btn-submit:hover { background: #4f46e5; }
+    .live-preview {
+      margin-top: 2rem;
+      background: #0d1117;
+      border: 1px solid #21262d;
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+    .live-preview h4 {
+      color: #38bdf8;
+      font-size: 0.9rem;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+    }
+    pre {
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: #34d399;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    const INITIAL_FORM = {
+      fullName: '',
+      email: '',
+      username: '',
+      password: '',
+      confirmPassword: '',
+      gender: 'female',
+      country: 'US',
+      bio: '',
+      skills: [],
+      newsletter: true,
+      termsAccepted: false
+    };
+
+    function UserRegistrationForm() {
+      // 1. Controlled State for all form elements
+      const [formData, setFormData] = useState(INITIAL_FORM);
+      const [errors, setErrors] = useState({});
+      const [showPassword, setShowPassword] = useState(false);
+      const [submitted, setSubmitted] = useState(false);
+
+      // Single controlled change handler for input, select, textarea, checkbox & radio
+      const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        
+        let val;
+        if (type === 'checkbox' && name !== 'skills') {
+          val = checked;
+        } else if (name === 'skills') {
+          val = checked 
+            ? [...formData.skills, value] 
+            : formData.skills.filter(s => s !== value);
+        } else {
+          val = value;
+        }
+
+        setFormData(prev => ({
+          ...prev,
+          [name]: val
+        }));
+
+        // Clear error on change
+        if (errors[name]) {
+          setErrors(prev => ({ ...prev, [name]: '' }));
+        }
+      };
+
+      const getPasswordStrength = (pass) => {
+        if (!pass) return { score: 0, label: '', color: '#374151' };
+        let score = 0;
+        if (pass.length >= 8) score += 25;
+        if (/[A-Z]/.test(pass)) score += 25;
+        if (/[0-9]/.test(pass)) score += 25;
+        if (/[^A-Za-z0-9]/.test(pass)) score += 25;
+
+        if (score <= 25) return { score, label: 'Weak', color: '#ef4444' };
+        if (score <= 50) return { score, label: 'Fair', color: '#f59e0b' };
+        if (score <= 75) return { score, label: 'Good', color: '#3b82f6' };
+        return { score, label: 'Strong', color: '#10b981' };
+      };
+
+      const validate = () => {
+        const newErrors = {};
+        if (!formData.fullName.trim()) newErrors.fullName = 'Full Name is required';
+        if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Valid Email is required';
+        if (!formData.username.trim()) newErrors.username = 'Username is required';
+        if (!formData.password || formData.password.length < 8) newErrors.password = 'Password must be at least 8 chars';
+        if (formData.confirmPassword !== formData.password) newErrors.confirmPassword = 'Passwords do not match';
+        if (!formData.termsAccepted) newErrors.termsAccepted = 'You must accept the terms';
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (validate()) {
+          setSubmitted(true);
+        }
+      };
+
+      const handleReset = () => {
+        setFormData(INITIAL_FORM);
+        setErrors({});
+        setSubmitted(false);
+      };
+
+      const passStrength = getPasswordStrength(formData.password);
+
+      return (
+        <div className="container">
+          <header>
+            <span className="badge">React Controlled Components</span>
+            <h1>User Registration Form</h1>
+            <p>Form inputs controlled directly by React State (<code>useState</code>)</p>
+          </header>
+
+          <div className="card">
+            <form onSubmit={handleSubmit}>
+              <div className="form-section">
+                <h3 className="section-title">👤 Personal Information</h3>
+                <div className="grid-2col">
+                  <div className={`field ${errors.fullName ? 'error' : ''}`}>
+                    <label>Full Name <span className="req">*</span></label>
+                    <input
+                      type="text"
+                      name="fullName"
+                      placeholder="Jane Doe"
+                      value={formData.fullName}
+                      onChange={handleChange}
+                    />
+                    {errors.fullName && <span className="error-msg">⚠️ {errors.fullName}</span>}
+                  </div>
+
+                  <div className={`field ${errors.email ? 'error' : ''}`}>
+                    <label>Email Address <span className="req">*</span></label>
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="jane@example.com"
+                      value={formData.email}
+                      onChange={handleChange}
+                    />
+                    {errors.email && <span className="error-msg">⚠️ {errors.email}</span>}
+                  </div>
+                </div>
+
+                <div className="grid-2col">
+                  <div className={`field ${errors.username ? 'error' : ''}`}>
+                    <label>Username <span className="req">*</span></label>
+                    <input
+                      type="text"
+                      name="username"
+                      placeholder="janedoe"
+                      value={formData.username}
+                      onChange={handleChange}
+                    />
+                    {errors.username && <span className="error-msg">⚠️ {errors.username}</span>}
+                  </div>
+
+                  <div className="field">
+                    <label>Country</label>
+                    <select name="country" value={formData.country} onChange={handleChange}>
+                      <option value="US">🇺🇸 United States</option>
+                      <option value="IN">🇮🇳 India</option>
+                      <option value="UK">🇬🇧 United Kingdom</option>
+                      <option value="CA">🇨🇦 Canada</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-section">
+                <h3 className="section-title">🔒 Account Security</h3>
+                <div className="grid-2col">
+                  <div className={`field ${errors.password ? 'error' : ''}`}>
+                    <label>Password <span className="req">*</span></label>
+                    <div className="pass-wrapper">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        name="password"
+                        placeholder="••••••••"
+                        value={formData.password}
+                        onChange={handleChange}
+                      />
+                      <button
+                        type="button"
+                        className="toggle-pass"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? '👁️' : '🙈'}
+                      </button>
+                    </div>
+                    {formData.password && (
+                      <div className="strength-bar">
+                        <div 
+                          className="strength-fill" 
+                          style={{ width: `${passStrength.score}%`, backgroundColor: passStrength.color }}
+                        ></div>
+                      </div>
+                    )}
+                    {errors.password && <span className="error-msg">⚠️ {errors.password}</span>}
+                  </div>
+
+                  <div className={`field ${errors.confirmPassword ? 'error' : ''}`}>
+                    <label>Confirm Password <span className="req">*</span></label>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      placeholder="••••••••"
+                      value={formData.confirmPassword}
+                      onChange={handleChange}
+                    />
+                    {errors.confirmPassword && <span className="error-msg">⚠️ {errors.confirmPassword}</span>}
+                  </div>
+                </div>
+              </div>
+
+              <div className="form-section">
+                <h3 className="section-title">⚙️ Preferences & Bio</h3>
+                
+                <div className="field">
+                  <label>Gender</label>
+                  <div className="radio-group">
+                    {['female', 'male', 'other'].map(g => (
+                      <label key={g} className={`pill-label ${formData.gender === g ? 'active' : ''}`}>
+                        <input
+                          type="radio"
+                          name="gender"
+                          value={g}
+                          checked={formData.gender === g}
+                          onChange={handleChange}
+                        />
+                        <span style={{ textTransform: 'capitalize' }}>{g}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label>Skills</label>
+                  <div className="checkbox-grid">
+                    {['React', 'JavaScript', 'CSS', 'Node.js'].map(skill => (
+                      <label key={skill} className={`pill-label ${formData.skills.includes(skill) ? 'active' : ''}`}>
+                        <input
+                          type="checkbox"
+                          name="skills"
+                          value={skill}
+                          checked={formData.skills.includes(skill)}
+                          onChange={handleChange}
+                        />
+                        <span>{skill}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label>Short Bio</label>
+                  <textarea
+                    name="bio"
+                    rows="3"
+                    placeholder="Brief description..."
+                    value={formData.bio}
+                    onChange={handleChange}
+                  ></textarea>
+                </div>
+
+                <div className="field">
+                  <label style={{ cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      name="termsAccepted"
+                      checked={formData.termsAccepted}
+                      onChange={handleChange}
+                    />
+                    <span style={{ marginLeft: '0.5rem' }}>
+                      I agree to the Terms & Conditions <span className="req">*</span>
+                    </span>
+                  </label>
+                  {errors.termsAccepted && <span className="error-msg">⚠️ {errors.termsAccepted}</span>}
+                </div>
+              </div>
+
+              <div className="actions">
+                <button type="button" className="btn-reset" onClick={handleReset}>
+                  Reset Form
+                </button>
+                <button type="submit" className="btn-submit">
+                  Create Account
+                </button>
+              </div>
+            </form>
+
+            <div className="live-preview">
+              <h4>⚡ Live Controlled Component State (React useState)</h4>
+              <pre>{JSON.stringify(formData, null, 2)}</pre>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<UserRegistrationForm />);
+  </script>
+</body>
+</html>

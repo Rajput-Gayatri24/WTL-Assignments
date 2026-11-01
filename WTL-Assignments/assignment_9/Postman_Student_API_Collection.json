@@ -1,0 +1,139 @@
+{
+  "info": {
+    "name": "Node.js & Express Student REST API",
+    "description": "Postman Collection for testing static routes, JSON routes, and Student CRUD operations.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. GET Static Home Page",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": [""]
+        }
+      }
+    },
+    {
+      "name": "2. GET Static JSON Info",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/info.json",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["info.json"]
+        }
+      }
+    },
+    {
+      "name": "3. GET API Metadata (JSON Route)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/info",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "info"]
+        }
+      }
+    },
+    {
+      "name": "4. GET All Students (REST GET)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/students",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "students"]
+        }
+      }
+    },
+    {
+      "name": "5. GET Single Student by ID (REST GET)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/students/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "students", "1"]
+        }
+      }
+    },
+    {
+      "name": "6. POST Create New Student (REST POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Neha Gupta\",\n  \"prn\": \"2024CS104\",\n  \"email\": \"neha.gupta@example.com\",\n  \"department\": \"Computer Science\",\n  \"year\": \"TY\",\n  \"gpa\": 3.95,\n  \"skills\": [\"Node.js\", \"MongoDB\", \"Express\"]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/students",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "students"]
+        }
+      }
+    },
+    {
+      "name": "7. PUT Update Student by ID (REST PUT)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Aarav Sharma (Updated)\",\n  \"gpa\": 3.98,\n  \"skills\": [\"React\", \"Node.js\", \"Python\", \"Docker\"]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/students/1",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "students", "1"]
+        }
+      }
+    },
+    {
+      "name": "8. DELETE Student by ID (REST DELETE)",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/students/3",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "students", "3"]
+        }
+      }
+    }
+  ]
+}

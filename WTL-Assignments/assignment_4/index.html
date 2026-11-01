@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeScript Student Analytics App | WTL Assignment 4</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            padding-bottom: 50px;
+        }
+        .app-header {
+            background: linear-gradient(135deg, #312e81, #1e1b4b);
+            color: white;
+            padding: 40px 0 60px 0;
+            border-bottom: 4px solid #6366f1;
+        }
+        .card-custom {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Banner -->
+    <header class="app-header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <span class="badge bg-primary px-3 py-2 rounded-pill mb-2">
+                        <i class="bi bi-filetype-tsx me-1"></i> WTL Lab Assignment 4
+                    </span>
+                    <h1 class="fw-bold mb-1">Student Performance & Grade Portal</h1>
+                    <p class="mb-0 text-white-50">Web-based application built with TypeScript • Interfaces, Enums, Classes & Dynamic Client-side DOM</p>
+                </div>
+                <div>
+                    <span class="badge bg-light text-dark px-3 py-2">
+                        <i class="bi bi-shield-check text-success me-1"></i> Strictly Typed via TypeScript
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="margin-top: -35px;">
+        <!-- Analytics Overview Row -->
+        <div class="row g-3 mb-4">
+            <div class="col-lg-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-people-fill"></i></div>
+                    <div>
+                        <h3 class="fw-bold mb-0" id="statTotal">0</h3>
+                        <small class="text-muted">Total Students</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-graph-up-arrow"></i></div>
+                    <div>
+                        <h3 class="fw-bold mb-0" id="statAvgSgpa">0.00</h3>
+                        <small class="text-muted">Class Average SGPA</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-trophy-fill"></i></div>
+                    <div>
+                        <h3 class="fw-bold mb-0" id="statHighest">0.00</h3>
+                        <small class="text-muted">Highest SGPA</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-sm-6">
+                <div class="stat-card">
+                    <div class="stat-icon bg-info-subtle text-info"><i class="bi bi-check2-circle"></i></div>
+                    <div>
+                        <h3 class="fw-bold mb-0" id="statPassRate">0%</h3>
+                        <small class="text-muted">Passing Percentage</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Left Column: Add Student Form -->
+            <div class="col-lg-4">
+                <div class="card-custom">
+                    <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-person-plus text-primary me-2"></i> Add Student Record</h5>
+                    <form id="studentForm">
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">PRN (Student ID) <span class="text-danger">*</span></label>
+                            <input type="text" id="prn" class="form-control" placeholder="e.g. 2024CS101" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Student Full Name <span class="text-danger">*</span></label>
+                            <input type="text" id="fullName" class="form-control" placeholder="e.g. Rohan Sharma" required>
+                        </div>
+                        <div class="row g-2 mb-3">
+                            <div class="col-7">
+                                <label class="form-label fw-semibold">Department <span class="text-danger">*</span></label>
+                                <select id="department" class="form-select" required>
+                                    <option value="Computer" selected>Computer</option>
+                                    <option value="IT">IT</option>
+                                    <option value="AI&DS">AI&DS</option>
+                                    <option value="ENTC">ENTC</option>
+                                </select>
+                            </div>
+                            <div class="col-5">
+                                <label class="form-label fw-semibold">Semester</label>
+                                <input type="number" id="semester" class="form-control" value="5" min="1" max="8" required>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold mt-4 mb-2 text-secondary">Subject Marks (Out of 100)</h6>
+                        <div class="row g-2 mb-2">
+                            <div class="col-6">
+                                <label class="small fw-semibold text-muted">WTL</label>
+                                <input type="number" id="markWTL" class="form-control form-control-sm" placeholder="0-100" min="0" max="100" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="small fw-semibold text-muted">TOC</label>
+                                <input type="number" id="markTOC" class="form-control form-control-sm" placeholder="0-100" min="0" max="100" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="small fw-semibold text-muted">Cyber Sec</label>
+                                <input type="number" id="markCyber" class="form-control form-control-sm" placeholder="0-100" min="0" max="100" required>
+                            </div>
+                            <div class="col-6">
+                                <label class="small fw-semibold text-muted">AMLIS</label>
+                                <input type="number" id="markAMLIS" class="form-control form-control-sm" placeholder="0-100" min="0" max="100" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-semibold mt-3 py-2">
+                            <i class="bi bi-save me-1"></i> Calculate & Save Record
+                        </button>
+                    </form>
+
+                    <div id="successToast" class="alert alert-success mt-3 py-2 small d-none" role="alert">
+                        <i class="bi bi-check-circle-fill me-1"></i> Record added and SGPA calculated successfully!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Student Records Table -->
+            <div class="col-lg-8">
+                <div class="card-custom">
+                    <!-- Controls Bar -->
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                        <h5 class="fw-bold mb-0 text-dark"><i class="bi bi-table text-primary me-2"></i> Student Performance Table</h5>
+                        <div class="d-flex gap-2">
+                            <select id="filterDept" class="form-select form-select-sm" style="width: 140px;">
+                                <option value="All" selected>All Departments</option>
+                                <option value="Computer">Computer</option>
+                                <option value="IT">IT</option>
+                                <option value="AI&DS">AI&DS</option>
+                                <option value="ENTC">ENTC</option>
+                            </select>
+                            <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Search by name/PRN..." style="width: 200px;">
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead class="table-light small">
+                                <tr>
+                                    <th>PRN</th>
+                                    <th>Student</th>
+                                    <th>Dept</th>
+                                    <th>Subject Marks</th>
+                                    <th>%</th>
+                                    <th>SGPA</th>
+                                    <th>Grade</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTableBody">
+                                <!-- Dynamic Render from TypeScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Compiled TypeScript script loaded as ES Module -->
+    <script type="module" src="./dist/app.js"></script>
+</body>
+</html>

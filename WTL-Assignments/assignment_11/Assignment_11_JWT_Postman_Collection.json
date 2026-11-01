@@ -1,0 +1,134 @@
+{
+  "info": {
+    "name": "WTL Assignment 11 - JWT Authentication & Protected Routes",
+    "description": "Collection to test user registration, login, JWT issuance, and accessing protected endpoints with Bearer tokens",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Register User (Bcrypt Password Hashing)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Gaurav Rajput\",\n  \"email\": \"gaurav.wtl@example.com\",\n  \"password\": \"SecurePass@123\",\n  \"role\": \"admin\",\n  \"department\": \"Computer\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5001/api/auth/register",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["api", "auth", "register"]
+        }
+      }
+    },
+    {
+      "name": "2. Login User (Obtain JWT Token)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "var jsonData = pm.response.json();",
+              "if (jsonData.token) {",
+              "    pm.environment.set('jwt_token', jsonData.token);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"gaurav.wtl@example.com\",\n  \"password\": \"SecurePass@123\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5001/api/auth/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["api", "auth", "login"]
+        }
+      }
+    },
+    {
+      "name": "3. Access Protected Profile (With Valid JWT Token)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:5001/api/protected/profile",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["api", "protected", "profile"]
+        }
+      }
+    },
+    {
+      "name": "4. Access Protected Academic Records (With Valid JWT Token)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{jwt_token}}"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:5001/api/protected/academic-records",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["api", "protected", "academic-records"]
+        }
+      }
+    },
+    {
+      "name": "5. Access Protected Route WITHOUT Token (Should Fail 401)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5001/api/protected/profile",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["api", "protected", "profile"]
+        }
+      }
+    },
+    {
+      "name": "6. Access Protected Route with TAMPERED Token (Should Fail 403)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer tampered.fake.token.signature"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:5001/api/protected/profile",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5001",
+          "path": ["api", "protected", "profile"]
+        }
+      }
+    }
+  ]
+}

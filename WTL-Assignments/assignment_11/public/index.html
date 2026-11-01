@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server-side JWT Authentication & Protected Routes | WTL Assignment 11</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: #0f172a; color: #f8fafc; padding-bottom: 50px; }
+        .hero { background: linear-gradient(135deg, #1e1b4b, #312e81); color: white; padding: 40px 0; border-bottom: 4px solid #6366f1; }
+        .card-custom { background: #1e293b; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08); padding: 26px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .token-display { background: #090d16; border: 1px solid #334155; border-radius: 12px; padding: 14px; font-family: monospace; font-size: 0.8rem; word-break: break-all; color: #38bdf8; }
+        .form-control, .form-select { background: #0f172a; border-color: #334155; color: white; }
+        .form-control:focus, .form-select:focus { background: #0f172a; color: white; border-color: #6366f1; }
+    </style>
+</head>
+<body>
+
+    <header class="hero mb-4">
+        <div class="container">
+            <span class="badge bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 fw-bold px-3 py-2 rounded-pill mb-2">
+                <i class="bi bi-shield-lock-fill me-1"></i> WTL Assignment 11
+            </span>
+            <h2 class="fw-bold mb-1">Server-Side JWT Authentication & Protected Routes</h2>
+            <p class="mb-0 text-white-50">Node.js, Express, MongoDB (Mongoose), Bcrypt Password Hashing & JSON Web Tokens</p>
+        </div>
+    </header>
+
+    <div class="container max-w-5xl">
+        <!-- Auth Status Bar -->
+        <div class="card-custom mb-4">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div id="authStatusIcon" class="fs-2 text-warning"><i class="bi bi-lock"></i></div>
+                    <div>
+                        <div class="small text-muted text-uppercase fw-semibold">Current Session Status</div>
+                        <h5 class="fw-bold mb-0" id="authStatusText">Guest (Not Authenticated)</h5>
+                    </div>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-danger btn-sm rounded-pill px-3" onclick="logoutUser()">
+                        <i class="bi bi-box-arrow-right me-1"></i> Clear Token (Logout)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Token Box -->
+            <div class="mt-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <small class="text-muted fw-semibold">Stored JWT Bearer Token in localStorage:</small>
+                    <small id="tokenExpiryLabel" class="text-secondary"></small>
+                </div>
+                <div class="token-display" id="tokenBox">No JWT token in localStorage. Please log in or register below.</div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- 1. Register Form -->
+            <div class="col-md-6">
+                <div class="card-custom h-100">
+                    <h5 class="fw-bold mb-3 text-info"><i class="bi bi-person-plus-fill me-2"></i> 1. Register User (POST /api/auth/register)</h5>
+                    <form onsubmit="handleRegister(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Full Name</label>
+                            <input type="text" id="regName" class="form-control" required placeholder="e.g. Gaurav Rajput">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Email Address</label>
+                            <input type="email" id="regEmail" class="form-control" required placeholder="e.g. gaurav@example.com">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Password (Encrypted with bcrypt)</label>
+                            <input type="password" id="regPassword" class="form-control" required placeholder="Minimum 6 characters">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">User Role</label>
+                            <select id="regRole" class="form-select">
+                                <option value="student" selected>Student</option>
+                                <option value="faculty">Faculty</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-info w-100 rounded-pill fw-semibold">
+                            Register & Get JWT Token
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 2. Login Form -->
+            <div class="col-md-6">
+                <div class="card-custom h-100">
+                    <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-key-fill me-2"></i> 2. User Login (POST /api/auth/login)</h5>
+                    <form onsubmit="handleLogin(event)">
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Registered Email</label>
+                            <input type="email" id="loginEmail" class="form-control" required placeholder="e.g. gaurav@example.com">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold">Password</label>
+                            <input type="password" id="loginPassword" class="form-control" required placeholder="Enter password">
+                        </div>
+                        <div class="mb-3">
+                            <small class="text-muted d-block">Demo testing shortcut:</small>
+                            <button type="button" class="btn btn-sm btn-outline-secondary mt-1 py-1" onclick="fillDemoCredentials()">
+                                Use Demo Credentials
+                            </button>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill fw-semibold">
+                            Log In & Obtain Token
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Protected Routes Testing Panel -->
+        <div class="card-custom">
+            <h5 class="fw-bold mb-3 text-success">
+                <i class="bi bi-shield-check me-2"></i> 3. Test Protected Endpoints (Requires Authorization: Bearer &lt;token&gt;)
+            </h5>
+            <p class="text-muted small">
+                Clicking the buttons below will attach the JWT from <code>localStorage</code> to the request header. If the token is missing, invalid, or expired, the backend middleware will reject the request with HTTP 401/403.
+            </p>
+
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <button class="btn btn-outline-light rounded-pill btn-sm px-3" onclick="testProtectedEndpoint('/api/protected/profile')">
+                    <i class="bi bi-person-badge me-1"></i> GET /api/protected/profile
+                </button>
+                <button class="btn btn-outline-light rounded-pill btn-sm px-3" onclick="testProtectedEndpoint('/api/protected/academic-records')">
+                    <i class="bi bi-mortarboard me-1"></i> GET /api/protected/academic-records
+                </button>
+                <button class="btn btn-outline-warning rounded-pill btn-sm px-3" onclick="testProtectedEndpoint('/api/protected/admin-dashboard')">
+                    <i class="bi bi-gear-fill me-1"></i> GET /api/protected/admin-dashboard (Admin Only)
+                </button>
+                <button class="btn btn-outline-danger rounded-pill btn-sm px-3" onclick="testInvalidToken()">
+                    <i class="bi bi-bug me-1"></i> Test Invalid Token (Tampered)
+                </button>
+            </div>
+
+            <!-- Response Viewer -->
+            <div class="bg-black/40 border border-slate-700 rounded-3 p-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <span class="small fw-semibold text-secondary">Backend Response JSON:</span>
+                    <span class="badge" id="responseStatusBadge">Status: Ready</span>
+                </div>
+                <pre class="m-0 text-success small" id="responseViewer">// Click one of the test buttons above to invoke protected routes.</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TOKEN_KEY = 'wtl_jwt_token';
+
+        function updateUI() {
+            const token = localStorage.getItem(TOKEN_KEY);
+            const tokenBox = document.getElementById('tokenBox');
+            const statusText = document.getElementById('authStatusText');
+            const statusIcon = document.getElementById('authStatusIcon');
+
+            if (token) {
+                tokenBox.innerText = token;
+                try {
+                    const payload = JSON.parse(atob(token.split('.')[1]));
+                    statusText.innerText = `Logged in as: ${payload.name} (${payload.role.toUpperCase()})`;
+                    statusText.className = 'fw-bold mb-0 text-success';
+                    statusIcon.className = 'fs-2 text-success';
+                    statusIcon.innerHTML = '<i class="bi bi-unlock"></i>';
+                } catch(e) {
+                    statusText.innerText = 'Token Present (Custom)';
+                }
+            } else {
+                tokenBox.innerText = 'No JWT token in localStorage. Please log in or register below.';
+                statusText.innerText = 'Guest (Not Authenticated)';
+                statusText.className = 'fw-bold mb-0 text-warning';
+                statusIcon.className = 'fs-2 text-warning';
+                statusIcon.innerHTML = '<i class="bi bi-lock"></i>';
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const body = {
+                name: document.getElementById('regName').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                role: document.getElementById('regRole').value
+            };
+
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            showResponse(res.status, data);
+
+            if (data.success && data.token) {
+                localStorage.setItem(TOKEN_KEY, data.token);
+                updateUI();
+                alert('Registration successful! JWT Token saved.');
+            } else {
+                alert(data.message || 'Registration failed');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const body = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await res.json();
+            showResponse(res.status, data);
+
+            if (data.success && data.token) {
+                localStorage.setItem(TOKEN_KEY, data.token);
+                updateUI();
+                alert(`Welcome back, ${data.user.name}! Authenticated with JWT.`);
+            } else {
+                alert(data.message || 'Login failed');
+            }
+        }
+
+        async function testProtectedEndpoint(url) {
+            const token = localStorage.getItem(TOKEN_KEY);
+            const res = await fetch(url, {
+                headers: {
+                    'Authorization': token ? `Bearer ${token}` : ''
+                }
+            });
+            const data = await res.json();
+            showResponse(res.status, data);
+        }
+
+        async function testInvalidToken() {
+            const res = await fetch('/api/protected/profile', {
+                headers: {
+                    'Authorization': 'Bearer fake_invalid_or_tampered_jwt_token_12345'
+                }
+            });
+            const data = await res.json();
+            showResponse(res.status, data);
+        }
+
+        function showResponse(status, data) {
+            const badge = document.getElementById('responseStatusBadge');
+            const viewer = document.getElementById('responseViewer');
+
+            if (status >= 200 && status < 300) {
+                badge.className = 'badge bg-success';
+                badge.innerText = `HTTP ${status} OK`;
+                viewer.className = 'm-0 text-success small';
+            } else {
+                badge.className = 'badge bg-danger';
+                badge.innerText = `HTTP ${status} Refused`;
+                viewer.className = 'm-0 text-danger small';
+            }
+
+            viewer.innerText = JSON.stringify(data, null, 2);
+        }
+
+        function logoutUser() {
+            localStorage.removeItem(TOKEN_KEY);
+            updateUI();
+            showResponse(200, { message: 'Logged out. JWT token removed from browser.' });
+        }
+
+        function fillDemoCredentials() {
+            document.getElementById('loginEmail').value = 'gaurav@example.com';
+            document.getElementById('loginPassword').value = 'secret123';
+        }
+
+        // Initialize UI
+        updateUI();
+    </script>
+</body>
+</html>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Node.js & Express RESTful API Student Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="header">
+      <div className="badge">EXPRESS.JS & NODE.JS BACK-END SERVER</div>
+      <h1>Student RESTful API & Static Server</h1>
+      <p>Demonstrating static file serving, JSON responses, and full HTTP CRUD (GET, POST, PUT, DELETE)</p>
+    </header>
+
+    <!-- Quick Status Cards -->
+    <div class="status-grid">
+      <div class="status-card">
+        <span class="status-label">Static Route</span>
+        <strong class="status-val text-green">GET / (200 OK)</strong>
+        <span class="status-sub">Serving public HTML & Assets</span>
+      </div>
+      <div class="status-card">
+        <span class="status-label">JSON Info Route</span>
+        <strong class="status-val text-blue">GET /api/info</strong>
+        <span class="status-sub">Serving JSON metadata</span>
+      </div>
+      <div class="status-card">
+        <span class="status-label">REST API Endpoint</span>
+        <strong class="status-val text-purple">/api/students</strong>
+        <span class="status-sub">GET, POST, PUT, DELETE</span>
+      </div>
+    </div>
+
+    <!-- Main Content Tabs / Layout -->
+    <div class="main-layout">
+      <!-- Left Column: Student CRUD Form -->
+      <div class="card form-card">
+        <h2 id="formTitle">➕ Add New Student Object</h2>
+        <p class="card-desc">Send <code>POST</code> (or <code>PUT</code> to edit) to <code>/api/students</code></p>
+        
+        <form id="studentForm">
+          <input type="hidden" id="studentId" value="">
+
+          <div class="form-group">
+            <label>Full Name <span class="req">*</span></label>
+            <input type="text" id="name" placeholder="e.g. Aarav Sharma" required>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label>PRN <span class="req">*</span></label>
+              <input type="text" id="prn" placeholder="e.g. 2024CS105" required>
+            </div>
+            <div class="form-group">
+              <label>Academic Year</label>
+              <select id="year">
+                <option value="FE">FE (First Year)</option>
+                <option value="SE">SE (Second Year)</option>
+                <option value="TY" selected>TY (Third Year)</option>
+                <option value="BTech">BTech (Final Year)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Email Address <span class="req">*</span></label>
+            <input type="email" id="email" placeholder="student@example.com" required>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-group">
+              <label>Department <span class="req">*</span></label>
+              <select id="department">
+                <option value="Computer Science">Computer Science</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Electronics & Telecom">Electronics & Telecom</option>
+                <option value="Mechanical Engineering">Mechanical Engineering</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>GPA (0.00 - 4.00)</label>
+              <input type="number" id="gpa" step="0.01" min="0" max="4" value="3.75">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Skills (Comma separated)</label>
+            <input type="text" id="skills" placeholder="React, Node.js, Python">
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="btnCancelEdit" class="btn btn-secondary" style="display: none;">Cancel</button>
+            <button type="submit" id="btnSubmit" class="btn btn-primary">🚀 Submit (POST)</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Right Column: Live Data Feed & Response Inspector -->
+      <div class="right-column">
+        <!-- Control Bar -->
+        <div class="card control-card">
+          <div class="control-header">
+            <h3>📡 Student Records</h3>
+            <div class="btn-group">
+              <button id="btnFetchAll" class="btn btn-sm btn-outline">🔄 GET All</button>
+              <button id="btnFetchStaticJSON" class="btn btn-sm btn-outline">📄 GET Static JSON</button>
+            </div>
+          </div>
+
+          <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search by name, PRN or email...">
+            <select id="filterDept">
+              <option value="">All Departments</option>
+              <option value="Computer Science">Computer Science</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Electronics & Telecom">Electronics & Telecom</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Student Cards List -->
+        <div id="studentsList" class="students-grid">
+          <!-- Dynamic rendering -->
+        </div>
+
+        <!-- JSON Response Terminal -->
+        <div class="card terminal-card">
+          <div class="terminal-header">
+            <span>💻 Server Response Inspector</span>
+            <span id="responseStatus" class="tag tag-ok">HTTP 200 OK</span>
+          </div>
+          <pre id="jsonOutput" class="terminal-body">// Response output from API will appear here...</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = '/api/students';
+    let editMode = false;
+
+    // Elements
+    const studentForm = document.getElementById('studentForm');
+    const formTitle = document.getElementById('formTitle');
+    const studentIdInput = document.getElementById('studentId');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const btnCancelEdit = document.getElementById('btnCancelEdit');
+    const studentsList = document.getElementById('studentsList');
+    const jsonOutput = document.getElementById('jsonOutput');
+    const responseStatus = document.getElementById('responseStatus');
+    const searchInput = document.getElementById('searchInput');
+    const filterDept = document.getElementById('filterDept');
+
+    // Display Response JSON
+    function logResponse(status, text, data) {
+      responseStatus.textContent = `HTTP ${status} ${text}`;
+      responseStatus.className = `tag ${status >= 200 && status < 300 ? 'tag-ok' : 'tag-err'}`;
+      jsonOutput.textContent = JSON.stringify(data, null, 2);
+    }
+
+    // 1. GET ALL STUDENTS (REST GET)
+    async function fetchStudents() {
+      const search = searchInput.value.trim();
+      const dept = filterDept.value;
+      
+      let url = `${API_BASE}?`;
+      if (search) url += `search=${encodeURIComponent(search)}&`;
+      if (dept) url += `department=${encodeURIComponent(dept)}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+        logResponse(res.status, res.statusText, data);
+
+        if (data.status === 'success') {
+          renderStudents(data.data);
+        }
+      } catch (err) {
+        logResponse(500, 'Network Error', { error: err.message });
+      }
+    }
+
+    // Render Student Cards
+    function renderStudents(list) {
+      if (list.length === 0) {
+        studentsList.innerHTML = `<div class="empty-msg">No student records found.</div>`;
+        return;
+      }
+
+      studentsList.innerHTML = list.map(student => `
+        <div class="student-card">
+          <div class="card-head">
+            <span class="prn-badge">${student.prn}</span>
+            <div class="card-actions">
+              <button class="btn-icon" onclick="editStudent(${student.id})" title="PUT (Edit)">✏️</button>
+              <button class="btn-icon text-red" onclick="deleteStudent(${student.id})" title="DELETE">🗑️</button>
+            </div>
+          </div>
+          <h4>${student.name}</h4>
+          <p class="email">${student.email}</p>
+          <div class="meta-row">
+            <span>🏫 ${student.department} (${student.year})</span>
+            <span class="gpa">GPA: ${student.gpa}</span>
+          </div>
+          ${student.skills.length > 0 ? `
+            <div class="skills-row">
+              ${student.skills.map(s => `<span class="skill-tag">${s}</span>`).join('')}
+            </div>
+          ` : ''}
+        </div>
+      `).join('');
+    }
+
+    // 2. CREATE (POST) / UPDATE (PUT) STUDENT
+    studentForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const payload = {
+        name: document.getElementById('name').value,
+        prn: document.getElementById('prn').value,
+        email: document.getElementById('email').value,
+        department: document.getElementById('department').value,
+        year: document.getElementById('year').value,
+        gpa: parseFloat(document.getElementById('gpa').value),
+        skills: document.getElementById('skills').value
+      };
+
+      const isEdit = editMode && studentIdInput.value;
+      const url = isEdit ? `${API_BASE}/${studentIdInput.value}` : API_BASE;
+      const method = isEdit ? 'PUT' : 'POST';
+
+      try {
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        logResponse(res.status, res.statusText, data);
+
+        if (res.ok) {
+          resetForm();
+          fetchStudents();
+        }
+      } catch (err) {
+        logResponse(500, 'Request Failed', { error: err.message });
+      }
+    });
+
+    // 3. EDIT (PREPARE PUT)
+    async function editStudent(id) {
+      try {
+        const res = await fetch(`${API_BASE}/${id}`);
+        const data = await res.json();
+        logResponse(res.status, res.statusText, data);
+
+        if (data.status === 'success') {
+          const s = data.data;
+          studentIdInput.value = s.id;
+          document.getElementById('name').value = s.name;
+          document.getElementById('prn').value = s.prn;
+          document.getElementById('email').value = s.email;
+          document.getElementById('department').value = s.department;
+          document.getElementById('year').value = s.year;
+          document.getElementById('gpa').value = s.gpa;
+          document.getElementById('skills').value = Array.isArray(s.skills) ? s.skills.join(', ') : s.skills;
+
+          editMode = true;
+          formTitle.textContent = `✏️ Edit Student #${s.id} (PUT)`;
+          btnSubmit.textContent = '💾 Update Record (PUT)';
+          btnCancelEdit.style.display = 'inline-block';
+        }
+      } catch (err) {
+        logResponse(500, 'Failed to fetch student', { error: err.message });
+      }
+    }
+
+    // 4. DELETE STUDENT
+    async function deleteStudent(id) {
+      if (!confirm(`Are you sure you want to delete Student #${id}?`)) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        logResponse(res.status, res.statusText, data);
+
+        if (res.ok) {
+          fetchStudents();
+        }
+      } catch (err) {
+        logResponse(500, 'Delete Failed', { error: err.message });
+      }
+    }
+
+    // Cancel Edit
+    btnCancelEdit.addEventListener('click', resetForm);
+
+    function resetForm() {
+      studentForm.reset();
+      studentIdInput.value = '';
+      editMode = false;
+      formTitle.textContent = '➕ Add New Student Object';
+      btnSubmit.textContent = '🚀 Submit (POST)';
+      btnCancelEdit.style.display = 'none';
+    }
+
+    // 5. FETCH STATIC JSON ROUTE DEMO
+    document.getElementById('btnFetchStaticJSON').addEventListener('click', async () => {
+      try {
+        const res = await fetch('/info.json');
+        const data = await res.json();
+        logResponse(res.status, res.statusText, data);
+      } catch (err) {
+        logResponse(500, 'Fetch Failed', { error: err.message });
+      }
+    });
+
+    document.getElementById('btnFetchAll').addEventListener('click', fetchStudents);
+    searchInput.addEventListener('input', fetchStudents);
+    filterDept.addEventListener('change', fetchStudents);
+
+    // Initial Load
+    fetchStudents();
+  </script>
+</body>
+</html>

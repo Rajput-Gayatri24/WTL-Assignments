@@ -1,0 +1,105 @@
+{
+  "info": {
+    "name": "WTL Assignment 10 - MongoDB Mongoose & Serverless API",
+    "description": "Collection to test CRUD routes on MongoDB using Mongoose and the Serverless Summary Analytics Function",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Seed Demo Students to MongoDB",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/students/seed/demo",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "students", "seed", "demo"]
+        }
+      }
+    },
+    {
+      "name": "2. Get All Students (CRUD - Read)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/students",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "students"]
+        }
+      }
+    },
+    {
+      "name": "3. Create Student (CRUD - Create)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"prn\": \"2024CS199\",\n  \"name\": \"Saurabh Verma\",\n  \"email\": \"saurabh.verma@example.com\",\n  \"department\": \"Computer\",\n  \"year\": \"TY\",\n  \"semester\": 5,\n  \"gpa\": 9.10,\n  \"skills\": [\"React\", \"Node.js\", \"MongoDB\"]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/students",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "students"]
+        }
+      }
+    },
+    {
+      "name": "4. Get Student By PRN",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/students/2024CS101",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "students", "2024CS101"]
+        }
+      }
+    },
+    {
+      "name": "5. Update Student (CRUD - Update)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"gpa\": 9.80,\n  \"skills\": [\"React\", \"Node.js\", \"MongoDB\", \"TypeScript\", \"Docker\"]\n}"
+        },
+        "url": {
+          "raw": "http://localhost:5000/api/students/2024CS101",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "students", "2024CS101"]
+        }
+      }
+    },
+    {
+      "name": "6. Run Serverless Summary Analytics Function",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:5000/api/summary",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "5000",
+          "path": ["api", "summary"]
+        }
+      }
+    }
+  ]
+}

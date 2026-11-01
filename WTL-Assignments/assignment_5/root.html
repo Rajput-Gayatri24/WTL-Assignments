@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>React JSX Functional Components, Props & useState | WTL Assignment 5</title>
+    <!-- React 18 & ReactDOM 18 CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <!-- Babel Standalone CDN for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- TailwindCSS for modern design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen py-8 px-4">
+
+    <!-- Root Container for React -->
+    <div id="root"></div>
+
+    <!-- React Application Code with Babel JSX -->
+    <script type="text/babel">
+        const { useState } = React;
+
+        const SAMPLE_COURSES = [
+            {
+                id: 101,
+                title: "Full-Stack Web Development (MERN)",
+                category: "Web Dev",
+                instructor: "Prof. S. R. Kulkarni",
+                credits: 4,
+                rating: 4.9,
+                price: "Free",
+                description: "Master React, Node.js, Express, and MongoDB with real-world production projects."
+            },
+            {
+                id: 102,
+                title: "Theory of Computation & Automata",
+                category: "Core CS",
+                instructor: "Dr. A. B. Pawar",
+                credits: 3,
+                rating: 4.7,
+                price: "Free",
+                description: "Deep dive into DFA, NFA, Regular Expressions, Context-Free Grammars and Turing Machines."
+            },
+            {
+                id: 103,
+                title: "Applied Machine Learning & Intelligent Systems",
+                category: "AI & ML",
+                instructor: "Dr. P. V. Deshmukh",
+                credits: 4,
+                rating: 4.8,
+                price: "Free",
+                description: "Practical ML algorithms: Regression, Classification, Neural Networks with Scikit-Learn & PyTorch."
+            },
+            {
+                id: 104,
+                title: "Network Security & Ethical Hacking",
+                category: "Security",
+                instructor: "Prof. N. K. Sharma",
+                credits: 3,
+                rating: 4.6,
+                price: "Free",
+                description: "Hands-on penetration testing, cryptography, Wireshark packet analysis, and OWASP Top 10."
+            }
+        ];
+
+        function Header(props) {
+            return (
+                <header className="bg-slate-800/80 backdrop-blur border border-slate-700/60 rounded-2xl p-6 mb-8 flex flex-wrap justify-between items-center gap-4 shadow-xl">
+                    <div>
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="bg-indigo-500/20 text-indigo-400 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider border border-indigo-500/30">
+                                WTL Lab Assignment 5
+                            </span>
+                        </div>
+                        <h1 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-sky-300 to-purple-400">
+                            {props.title}
+                        </h1>
+                        <p className="text-slate-400 text-sm mt-1">{props.subtitle}</p>
+                    </div>
+                    <div className="bg-slate-900/90 border border-slate-700 px-4 py-2.5 rounded-xl flex items-center gap-3">
+                        <i className="fa-solid fa-graduation-cap text-indigo-400 text-xl"></i>
+                        <div>
+                            <div className="text-xs text-slate-400 font-semibold uppercase">Enrolled Courses</div>
+                            <div className="text-lg font-bold text-emerald-400">{props.enrolledCount} Courses ({props.totalCredits} Credits)</div>
+                        </div>
+                    </div>
+                </header>
+            );
+        }
+
+        function CourseCard({ course, isEnrolled, onToggleEnroll }) {
+            return (
+                <div className="bg-slate-800/70 border border-slate-700/60 rounded-2xl p-6 flex flex-col justify-between hover:border-indigo-500/50 transition-all hover:-translate-y-1 shadow-lg">
+                    <div>
+                        <div className="flex justify-between items-start mb-3">
+                            <span className="bg-indigo-950 text-indigo-400 text-xs px-2.5 py-1 rounded-md font-semibold border border-indigo-800">
+                                {course.category}
+                            </span>
+                            <span className="text-amber-400 text-xs font-bold flex items-center gap-1">
+                                <i className="fa-solid fa-star"></i> {course.rating}
+                            </span>
+                        </div>
+                        <h3 className="text-lg font-bold text-white mb-2 leading-snug">{course.title}</h3>
+                        <p className="text-slate-400 text-xs mb-4 line-clamp-2 leading-relaxed">{course.description}</p>
+                        <div className="flex items-center gap-2 text-xs text-slate-400 mb-4 pb-4 border-b border-slate-700/60">
+                            <i className="fa-regular fa-user text-indigo-400"></i>
+                            <span>{course.instructor}</span>
+                            <span className="mx-1">•</span>
+                            <i className="fa-solid fa-award text-indigo-400"></i>
+                            <span>{course.credits} Credits</span>
+                        </div>
+                    </div>
+                    <div className="flex justify-between items-center mt-2">
+                        <span className="text-emerald-400 font-bold text-sm">{course.price}</span>
+                        <button
+                            onClick={() => onToggleEnroll(course.id)}
+                            className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+                                isEnrolled
+                                    ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30 hover:bg-rose-500/30'
+                                    : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30'
+                            }`}
+                        >
+                            {isEnrolled ? 'Enrolled (Drop)' : '+ Enroll Now'}
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        function App() {
+            const [courses] = useState(SAMPLE_COURSES);
+            const [enrolledIds, setEnrolledIds] = useState([101]);
+
+            const handleToggleEnroll = (courseId) => {
+                if (enrolledIds.includes(courseId)) {
+                    setEnrolledIds(enrolledIds.filter(id => id !== courseId));
+                } else {
+                    setEnrolledIds([...enrolledIds, courseId]);
+                }
+            };
+
+            const enrolledCourses = courses.filter(c => enrolledIds.includes(c.id));
+            const totalCredits = enrolledCourses.reduce((sum, c) => sum + c.credits, 0);
+
+            return (
+                <div className="max-w-6xl mx-auto">
+                    <Header
+                        title="React Props & useState Demo"
+                        subtitle="Passing data with props and managing state using useState Hook"
+                        enrolledCount={enrolledIds.length}
+                        totalCredits={totalCredits}
+                    />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {courses.map(course => (
+                            <CourseCard
+                                key={course.id}
+                                course={course}
+                                isEnrolled={enrolledIds.includes(course.id)}
+                                onToggleEnroll={handleToggleEnroll}
+                            />
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

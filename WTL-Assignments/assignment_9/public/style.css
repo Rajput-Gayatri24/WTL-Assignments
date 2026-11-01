@@ -1,0 +1,385 @@
+/* Dashboard Stylesheet for Express Student API */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #0b0f19;
+  color: #f3f4f6;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.35rem 0.9rem;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(129, 140, 248, 0.3);
+  color: #818cf8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  border-radius: 9999px;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+}
+
+.header h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: #9ca3af;
+  font-size: 1rem;
+}
+
+/* Status Grid */
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.status-card {
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-label {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.status-val {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.status-sub {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.text-green { color: #10b981; }
+.text-blue { color: #3b82f6; }
+.text-purple { color: #a855f7; }
+.text-red { color: #ef4444; }
+
+/* Main Layout */
+.main-layout {
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: #111827;
+  border: 1px solid #1f2937;
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.card h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.25rem;
+}
+
+.card-desc {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  margin-bottom: 1.25rem;
+}
+
+code {
+  background: #1e293b;
+  color: #38bdf8;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #d1d5db;
+  margin-bottom: 0.35rem;
+}
+
+.req { color: #ef4444; }
+
+input[type="text"],
+input[type="email"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.9rem;
+  outline: none;
+}
+
+input:focus, select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.btn {
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary {
+  background: #6366f1;
+  color: white;
+  flex: 1;
+}
+
+.btn-primary:hover { background: #4f46e5; }
+
+.btn-secondary {
+  background: #374151;
+  color: #d1d5db;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid #374151;
+  color: #9ca3af;
+}
+
+.btn-outline:hover {
+  background: #1f2937;
+  color: white;
+}
+
+/* Right Column */
+.right-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.control-card {
+  padding: 1.25rem;
+}
+
+.control-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.btn-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.search-bar {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.search-bar input { flex: 2; }
+.search-bar select { flex: 1; }
+
+/* Students Cards Grid */
+.students-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.student-card {
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.prn-badge {
+  background: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0.2rem;
+}
+
+.student-card h4 {
+  font-size: 1.05rem;
+  margin-bottom: 0.2rem;
+  color: #ffffff;
+}
+
+.email {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-bottom: 0.75rem;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: #d1d5db;
+  margin-bottom: 0.75rem;
+}
+
+.gpa {
+  font-weight: 700;
+  color: #10b981;
+}
+
+.skills-row {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.skill-tag {
+  background: #111827;
+  color: #9ca3af;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid #374151;
+}
+
+.empty-msg {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 2rem;
+  color: #6b7280;
+  background: #111827;
+  border-radius: 12px;
+  border: 1px dashed #374151;
+}
+
+/* Terminal Card */
+.terminal-card {
+  background: #0d1117;
+  border: 1px solid #21262d;
+  padding: 1rem;
+}
+
+.terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-size: 0.85rem;
+  color: #8b949e;
+}
+
+.tag {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.tag-ok {
+  background: rgba(16, 185, 129, 0.2);
+  color: #34d399;
+}
+
+.tag-err {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.terminal-body {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: #58a6ff;
+  max-height: 250px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}

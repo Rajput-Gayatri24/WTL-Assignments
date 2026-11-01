@@ -1,0 +1,12 @@
+{
+  "name": "assignment-4-typescript",
+  "version": "1.0.0",
+  "description": "WTL Lab Assignment 4: Web-based application using TypeScript with user interaction and client-side data display",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

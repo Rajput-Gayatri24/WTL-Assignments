@@ -1,0 +1,12 @@
+{
+  "title": "Static JSON Resource File",
+  "description": "This file is served directly via express.static('public')",
+  "course": "Web Technology Lab (WTL)",
+  "framework": "Express.js v4.19",
+  "features": [
+    "Static File Serving",
+    "JSON Data Routes",
+    "RESTful Student CRUD Operations",
+    "Postman API Testing Integration"
+  ]
+}
